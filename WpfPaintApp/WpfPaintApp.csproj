@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="6.0.2" />
+		<PackageReference Include="MessagePipe" Version="1.7.3" />
+		<PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+		<PackageReference Include="SkiaSharp.Views.WPF" Version="2.88.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CoreShape.Extensions.SkiaSharp\CoreShape.Extensions.SkiaSharp.csproj" />
+	  <ProjectReference Include="..\CoreShape\CoreShape.csproj" />
+	</ItemGroup>
+
+</Project>
