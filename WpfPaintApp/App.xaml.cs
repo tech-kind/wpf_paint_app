@@ -14,7 +14,7 @@ namespace WpfPaintApp;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App
+public partial class App : PrismApplication
 {
     private Container ConvertToDryIocContainer(IEnumerable<ServiceDescriptor> services, Func<IRegistrator, ServiceDescriptor, bool>? registerService = null)
     {
@@ -46,5 +46,5 @@ public partial class App
     }
 
     protected override Window CreateShell()
-        => this.Container.Resolve<MainWindow>();
+        => Container.Resolve<MainWindow>();
 }

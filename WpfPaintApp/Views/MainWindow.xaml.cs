@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CoreShape.Extensions.SkiaSharp;
+using CoreShape.Graphics;
+using CoreShape.Shapes;
+using SkiaSharp.Views.Desktop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +27,17 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    private void skElement_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var shape = new RectangleShape(100, 100, 200, 150)
+        {
+            Stroke = new Stroke(CoreShape.Color.Red, 2),
+            Fill = new Fill(CoreShape.Color.LightSkyBlue)
+        };
+
+        var g = new SkiaGraphics(e.Surface.Canvas);
+        shape.Draw(g);
     }
 }
