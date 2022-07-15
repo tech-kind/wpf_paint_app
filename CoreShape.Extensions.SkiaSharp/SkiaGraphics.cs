@@ -17,6 +17,11 @@ public class SkiaGraphics : IGraphics
         Canvas = canvas;
     }
 
+    public virtual void ClearCanvas(Color color)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual void DrawRectangle(Rectangle rectangle, Stroke stroke)
     {
         using var paint = new SKPaint().SetStroke(stroke);
@@ -27,5 +32,17 @@ public class SkiaGraphics : IGraphics
     {
         using var paint = new SKPaint().SetFill(fill);
         Canvas.DrawRect(rectangle.ToSk(), paint);
+    }
+
+    public virtual void DrawOval(Rectangle rectangle, Stroke stroke)
+    {
+        using var paint = new SKPaint().SetStroke(stroke);
+        Canvas.DrawOval(rectangle.ToSk(), paint);
+    }
+
+    public virtual void FillOval(Rectangle rectangle, Fill fill)
+    {
+        using var paint = new SKPaint().SetFill(fill);
+        Canvas.DrawOval(rectangle.ToSk(), paint);
     }
 }

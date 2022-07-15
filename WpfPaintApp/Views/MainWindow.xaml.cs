@@ -37,7 +37,14 @@ public partial class MainWindow : Window
             Fill = new Fill(CoreShape.Color.LightSkyBlue)
         };
 
+        var oval = new OvalShape(400, 100, 50, 50)
+        {
+            Stroke = new Stroke(CoreShape.Color.Red, 2),
+            Fill = new Fill(CoreShape.Color.LightSkyBlue)
+        };
+
         var g = new SkiaGraphics(e.Surface.Canvas);
         shape.Draw(g);
+        oval.Draw(g);
     }
 }
