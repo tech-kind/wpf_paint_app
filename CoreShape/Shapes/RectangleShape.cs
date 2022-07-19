@@ -1,5 +1,6 @@
 ﻿using CoreShape.Graphics;
 using CoreShape.Shapes.Interfaces;
+using CoreShape.Shapes.Strategy;
 
 namespace CoreShape.Shapes;
 public class RectangleShape : IShape
@@ -7,6 +8,7 @@ public class RectangleShape : IShape
     public Rectangle Bounds { get; protected set; }
     public Stroke? Stroke { get; set; }
     public Fill? Fill { get; set; }
+    protected IHitTestStrategy<RectangleShape> HitTestStrategy { get; set; }
 
     public RectangleShape()
             : this(new Rectangle())
@@ -16,6 +18,13 @@ public class RectangleShape : IShape
     public RectangleShape(Rectangle bounds)
     {
         Bounds = bounds;
+        HitTestStrategy = new RectangleHitTestStrategy();
+    }
+
+    public RectangleShape(Rectangle bounds, IHitTestStrategy<RectangleShape> hitTestStrategy)
+    {
+        Bounds=bounds;
+        HitTestStrategy = hitTestStrategy;
     }
 
     public RectangleShape(Point location, Size size)
@@ -38,43 +47,7 @@ public class RectangleShape : IShape
 
     public virtual bool HitTest(Point p)
     {
-        if (Stroke is not null)
-        {
-            // 上辺との当たり判定
-            if (p.X >= Bounds.Left && p.X <= Bounds.Right
-                && p.Y >= Bounds.Top - 2 && p.Y <= Bounds.Top + 2)
-            {
-                return true;
-            }
-            // 下辺との当たり判定
-            if (p.X >= Bounds.Left && p.X <= Bounds.Right
-                && p.Y >= Bounds.Bottom - 2 && p.Y <= Bounds.Bottom + 2)
-            {
-                return true;
-            }
-            // 左辺との当たり判定
-            if (p.Y >= Bounds.Top && p.Y <= Bounds.Bottom
-                && p.X >= Bounds.Left - 2 && p.X <= Bounds.Left + 2)
-            {
-                return true;
-            }
-            // 右辺との当たり判定
-            if (p.Y >= Bounds.Top && p.Y <= Bounds.Bottom
-                && p.X >= Bounds.Right - 2 && p.X <= Bounds.Right + 2)
-            {
-                return true;
-            }
-        }
-        if (Fill is not null)
-        {
-            // 図形内部の当たり判定
-            if (Bounds.Left <= p.X && p.X <= Bounds.Right
-                && Bounds.Top <= p.Y && p.Y <= Bounds.Bottom)
-            {
-                return true;
-            }
-        }
-        return false;
+        return HitTestStrategy.HitTest(p, this);
     }
 
     public virtual void Drag(Point oldPointer, Point currentPointer)

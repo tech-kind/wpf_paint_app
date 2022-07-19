@@ -20,10 +20,10 @@ public class MainWindowViewModel : BindableBase
 {
     //描画する図形をListに定義
     private IList<IShape> _shapes = new[]{
-        new OvalShape(new Rectangle(100, 100, 200, 150))
+        new OvalShape(new Rectangle(100, 100, 200, 150), new SKRegionOvalHitTestStrategy())
         {
             Stroke = new Stroke(Color.Red, 2),
-            //Fill = new Fill(CoreShape.Color.LightSkyBlue)
+            Fill = new Fill(CoreShape.Color.LightSkyBlue)
         },
         new RectangleShape(new Rectangle(350, 100, 100, 150))
         {

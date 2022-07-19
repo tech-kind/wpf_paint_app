@@ -23,4 +23,25 @@ public static class SkPaintExtensions
         paint.Color = fill.Color.ToSk();
         return paint;
     }
+
+    public static SKPaint SetPaintStyle(this SKPaint paint, Stroke? stroke, Fill? fill)
+    {
+        if (stroke is null && fill is null)
+        {
+            return paint;
+        }
+        if (stroke is null)
+        {
+            paint.Style = SKPaintStyle.Fill;
+        }
+        else if (fill is null)
+        {
+            paint.Style = SKPaintStyle.Stroke;
+        }
+        else
+        {
+            paint.Style = SKPaintStyle.StrokeAndFill;
+        }
+        return paint;
+    }
 }
