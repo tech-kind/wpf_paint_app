@@ -1,6 +1,7 @@
 ﻿using CoreShape.Extensions.SkiaSharp;
 using CoreShape.Graphics;
 using CoreShape.Shapes;
+using CoreShape.Shapes.Interfaces;
 using SkiaSharp.Views.Desktop;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfPaintApp.ViewModels;
 
 namespace WpfPaintApp.Views;
 
@@ -24,6 +26,7 @@ namespace WpfPaintApp.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
+
     public MainWindow()
     {
         InitializeComponent();
@@ -31,20 +34,6 @@ public partial class MainWindow : Window
 
     private void skElement_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        var shape = new RectangleShape(100, 100, 200, 150)
-        {
-            Stroke = new Stroke(CoreShape.Color.Red, 2),
-            Fill = new Fill(CoreShape.Color.LightSkyBlue)
-        };
-
-        var oval = new OvalShape(400, 100, 50, 50)
-        {
-            Stroke = new Stroke(CoreShape.Color.Red, 2),
-            Fill = new Fill(CoreShape.Color.LightSkyBlue)
-        };
-
-        var g = new SkiaGraphics(e.Surface.Canvas);
-        shape.Draw(g);
-        oval.Draw(g);
+        (DataContext as MainWindowViewModel)?.Draw(new SkiaGraphics(e.Surface.Canvas));
     }
 }

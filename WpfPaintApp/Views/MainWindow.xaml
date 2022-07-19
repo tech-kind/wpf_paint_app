@@ -4,12 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:skiaSharp="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:WpfPaintApp"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <skiaSharp:SKElement x:Name="skElement" PaintSurface="skElement_PaintSurface" />
+        <skiaSharp:SKElement
+            x:Name="skElement"
+            PaintSurface="skElement_PaintSurface">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseMove">
+                    <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" CommandParameter="{Binding ElementName=skElement}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </skiaSharp:SKElement>
     </Grid>
 </Window>

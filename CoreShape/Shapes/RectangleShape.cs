@@ -35,4 +35,51 @@ public class RectangleShape : IShape
             g.DrawRectangle(Bounds, Stroke);
         }
     }
+
+    public virtual bool HitTest(Point p)
+    {
+        if (Stroke is not null)
+        {
+            // 上辺との当たり判定
+            if (p.X >= Bounds.Left && p.X <= Bounds.Right
+                && p.Y >= Bounds.Top - 2 && p.Y <= Bounds.Top + 2)
+            {
+                return true;
+            }
+            // 下辺との当たり判定
+            if (p.X >= Bounds.Left && p.X <= Bounds.Right
+                && p.Y >= Bounds.Bottom - 2 && p.Y <= Bounds.Bottom + 2)
+            {
+                return true;
+            }
+            // 左辺との当たり判定
+            if (p.Y >= Bounds.Top && p.Y <= Bounds.Bottom
+                && p.X >= Bounds.Left - 2 && p.X <= Bounds.Left + 2)
+            {
+                return true;
+            }
+            // 右辺との当たり判定
+            if (p.Y >= Bounds.Top && p.Y <= Bounds.Bottom
+                && p.X >= Bounds.Right - 2 && p.X <= Bounds.Right + 2)
+            {
+                return true;
+            }
+        }
+        if (Fill is not null)
+        {
+            // 図形内部の当たり判定
+            if (Bounds.Left <= p.X && p.X <= Bounds.Right
+                && Bounds.Top <= p.Y && p.Y <= Bounds.Bottom)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public virtual void Drag(Point oldPointer, Point currentPointer)
+    {
+        var (dx, dy) = (currentPointer.X - oldPointer.X, currentPointer.Y - oldPointer.Y);
+        Bounds = new Rectangle(Bounds.Left + dx, Bounds.Top + dy, Bounds.Size.Width, Bounds.Size.Height);
+    }
 }

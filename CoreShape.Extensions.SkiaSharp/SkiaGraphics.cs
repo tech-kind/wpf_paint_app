@@ -19,7 +19,7 @@ public class SkiaGraphics : IGraphics
 
     public virtual void ClearCanvas(Color color)
     {
-        throw new NotImplementedException();
+        Canvas.Clear(color.ToSk());
     }
 
     public virtual void DrawRectangle(Rectangle rectangle, Stroke stroke)
