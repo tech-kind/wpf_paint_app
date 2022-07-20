@@ -1,14 +1,17 @@
 ﻿using CoreShape.Graphics;
 using CoreShape.Shapes.Interfaces;
+using CoreShape.Shapes.ResizeHandles;
 using CoreShape.Shapes.Strategy;
 
 namespace CoreShape.Shapes;
 public class RectangleShape : IShape
 {
+    public bool IsSelected { get; set; }
     public Rectangle Bounds { get; protected set; }
     public Stroke? Stroke { get; set; }
     public Fill? Fill { get; set; }
     protected IHitTestStrategy<RectangleShape> HitTestStrategy { get; set; }
+    protected ResizeHandleCollection ResizeHandles { get; set; }
 
     public RectangleShape()
             : this(new Rectangle())
@@ -19,12 +22,20 @@ public class RectangleShape : IShape
     {
         Bounds = bounds;
         HitTestStrategy = new RectangleHitTestStrategy();
+
+        // ResizeHandleCollection作成後、Boundsに合わせて配置
+        ResizeHandles = new ResizeHandleCollection(8, 8);
+        ResizeHandles.SetLocation(Bounds);
     }
 
     public RectangleShape(Rectangle bounds, IHitTestStrategy<RectangleShape> hitTestStrategy)
     {
         Bounds=bounds;
         HitTestStrategy = hitTestStrategy;
+
+        // ResizeHandleCollection作成後、Boundsに合わせて配置
+        ResizeHandles = new ResizeHandleCollection(8, 8);
+        ResizeHandles.SetLocation(Bounds);
     }
 
     public RectangleShape(Point location, Size size)
@@ -43,16 +54,68 @@ public class RectangleShape : IShape
         {
             g.DrawRectangle(Bounds, Stroke);
         }
+        if (IsSelected)
+        {
+            // 選択枠とリサイズハンドルを描画
+            if (Stroke is null)
+            {
+                g.DrawRectangle(Bounds, new Stroke(Color.Black, 1));
+            }
+            // リサイズハンドルをまとめて描画
+            ResizeHandles.Draw(g);
+        }
     }
 
-    public virtual bool HitTest(Point p)
+    public virtual HitResult HitTest(Point p)
     {
-        return HitTestStrategy.HitTest(p, this);
+        if (IsSelected)
+        {
+            // リサイズハンドルにヒットしたらそのハンドルのHitResultを返却
+            // 図形本体にヒットしたらHitResult.Bodyを返却
+            // ヒットしなかったらHitResult.Noneを返却
+            var hitResult = ResizeHandles.HitTest(p);
+            if (hitResult is not HitResult.None)
+            {
+                return hitResult;
+            }
+        }
+        return HitTestStrategy.HitTest(p, this) ? HitResult.Body : HitResult.None;
     }
 
     public virtual void Drag(Point oldPointer, Point currentPointer)
     {
+        if (ResizeHandles.ActiveHandle is not null)
+        {
+            SetBounds(ResizeHandles.Resize(currentPointer, Bounds));
+            return;
+        }
         var (dx, dy) = (currentPointer.X - oldPointer.X, currentPointer.Y - oldPointer.Y);
-        Bounds = new Rectangle(Bounds.Left + dx, Bounds.Top + dy, Bounds.Size.Width, Bounds.Size.Height);
+        SetBounds(new Rectangle(Bounds.Left + dx, Bounds.Top + dy, Bounds.Size.Width, Bounds.Size.Height));
+    }
+
+    public void Drop()
+    {
+        var (left, top, width, height) = (Bounds.Left, Bounds.Top, Bounds.Width, Bounds.Height);
+        // 幅がマイナスの場合
+        if (Bounds.Width < 0)
+        {
+            // 左右の座標を入れ替えて、幅の符号(-)を取る
+            left = Bounds.Right;
+            width = Math.Abs(Bounds.Width);
+        }
+        // 高さがマイナスの場合
+        if (Bounds.Height < 0)
+        {
+            // 上下の座標を入れ替えて、高さの符号(-)を取る
+            top = Bounds.Bottom;
+            height = Math.Abs(Bounds.Height);
+        }
+        SetBounds(new Rectangle(left, top, width, height));
+    }
+
+    protected void SetBounds(Rectangle bounds)
+    {
+        Bounds = bounds;
+        ResizeHandles.SetLocation(Bounds);
     }
 }

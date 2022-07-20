@@ -158,5 +158,5 @@ public record struct Color
     public static readonly Color DarkSlateGray = new Color(47, 79, 79);
     public static readonly Color DarkSlateGrey = new Color(47, 79, 79);
     public static readonly Color Black = new Color(0, 0, 0);
-
+    public static readonly Color Transparent = new Color(0, 0, 0, 0);
 }

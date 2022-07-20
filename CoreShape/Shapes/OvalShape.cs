@@ -32,5 +32,11 @@ public partial class OvalShape : RectangleShape
         {
             g.DrawOval(Bounds, Stroke);
         }
+        if (IsSelected)
+        {
+            g.DrawRectangle(Bounds, new Stroke(Color.Black, 1));
+            // リサイズハンドルをまとめて描画
+            ResizeHandles.Draw(g);
+        }
     }
 }

@@ -11,6 +11,10 @@ public static class SkPaintExtensions
 {
     public static SKPaint SetStroke(this SKPaint paint, Stroke stroke)
     {
+        if (stroke is null)
+        {
+            return paint;
+        }
         paint.Style = SKPaintStyle.Stroke;
         paint.Color = stroke.Color.ToSk();
         paint.StrokeWidth = stroke.Width;
@@ -19,6 +23,10 @@ public static class SkPaintExtensions
 
     public static SKPaint SetFill(this SKPaint paint, Fill fill)
     {
+        if (fill is null)
+        {
+            return paint;
+        }
         paint.Style = SKPaintStyle.Fill;
         paint.Color = fill.Color.ToSk();
         return paint;
