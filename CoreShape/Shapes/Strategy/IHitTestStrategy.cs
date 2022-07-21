@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreShape.Shapes.Strategy;
-public interface IHitTestStrategy<in TShape> where TShape : IShape
+public interface IHitTestStrategy
 {
-    bool HitTest(Point p, TShape shape);
+    bool HitTest(Point p, IShape shape);
 }

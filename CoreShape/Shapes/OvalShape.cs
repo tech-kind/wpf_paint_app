@@ -12,7 +12,7 @@ public partial class OvalShape : RectangleShape
     public OvalShape(Rectangle bounds) : base(bounds, new OvalHitTestStrategy())
     { }
 
-    public OvalShape(Rectangle bounds, IHitTestStrategy<RectangleShape> hitTestStrategy)
+    public OvalShape(Rectangle bounds, IHitTestStrategy hitTestStrategy)
             : base(bounds, hitTestStrategy)
     { }
 

@@ -10,7 +10,7 @@ public class RectangleShape : IShape
     public Rectangle Bounds { get; protected set; }
     public Stroke? Stroke { get; set; }
     public Fill? Fill { get; set; }
-    protected IHitTestStrategy<RectangleShape> HitTestStrategy { get; set; }
+    public IHitTestStrategy HitTestStrategy { get; set; }
     protected ResizeHandleCollection ResizeHandles { get; set; }
 
     public RectangleShape()
@@ -28,7 +28,7 @@ public class RectangleShape : IShape
         ResizeHandles.SetLocation(Bounds);
     }
 
-    public RectangleShape(Rectangle bounds, IHitTestStrategy<RectangleShape> hitTestStrategy)
+    public RectangleShape(Rectangle bounds, IHitTestStrategy hitTestStrategy)
     {
         Bounds=bounds;
         HitTestStrategy = hitTestStrategy;
@@ -113,9 +113,15 @@ public class RectangleShape : IShape
         SetBounds(new Rectangle(left, top, width, height));
     }
 
-    protected void SetBounds(Rectangle bounds)
+    public void SetBounds(Rectangle bounds)
     {
         Bounds = bounds;
         ResizeHandles.SetLocation(Bounds);
+    }
+
+    public void Locate(Point location)
+    {
+        SetBounds(new Rectangle(location, new Size()));
+        ResizeHandles.SetInitialActiveHandle();
     }
 }

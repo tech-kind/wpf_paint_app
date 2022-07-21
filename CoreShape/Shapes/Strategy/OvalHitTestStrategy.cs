@@ -1,13 +1,14 @@
-﻿using System;
+﻿using CoreShape.Shapes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreShape.Shapes.Strategy;
-public class OvalHitTestStrategy : IHitTestStrategy<RectangleShape>
+public class OvalHitTestStrategy : IHitTestStrategy
 {
-    public bool HitTest(Point p, RectangleShape shape)
+    public bool HitTest(Point p, IShape shape)
     {
         static double Discriminant(float x, float y, float xr, float yr)
             => (x * x) / (xr * xr) + (y * y) / (yr * yr);

@@ -1,13 +1,14 @@
-﻿using System;
+﻿using CoreShape.Shapes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreShape.Shapes.Strategy;
-public class RectangleHitTestStrategy : IHitTestStrategy<RectangleShape>
+public class RectangleHitTestStrategy : IHitTestStrategy
 {
-    public bool HitTest(Point p, RectangleShape shape)
+    public bool HitTest(Point p, IShape shape)
     {
         if (shape.Stroke is not null)
         {
