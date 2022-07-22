@@ -17,34 +17,33 @@ using System.Windows.Input;
 
 namespace WpfPaintApp.ViewModels;
 
+public enum PenMode
+{
+    Default,
+    Rect,
+    Oval
+}
+
 public class MainWindowViewModel : BindableBase
 {
-    //描画する図形をListに定義
-    private IList<IShape> _shapes = new[]{
-        new OvalShape(new Rectangle(100, 100, 200, 150), new SKRegionOvalHitTestStrategy())
-        {
-            Stroke = new Stroke(Color.Red, 2),
-            Fill = new Fill(Color.Transparent)
-        },
-        new RectangleShape(new Rectangle(350, 100, 100, 150))
-        {
-            Stroke = new Stroke(Color.Black, 2),
-            Fill = new Fill(Color.LightPink)
-        },
-    };
+    private IList<IShape> _shapes = new List<IShape>();
 
-    private IShape? _activeShape;
+    private IShapePen? _shapePen;
+    private IDraggable? _activeShape;
     private Point _oldPoint;
 
     public DelegateCommand<object> MouseMoveCommand { get; private set; }
     public DelegateCommand<object> MouseDownCommand { get; private set; }
-    public DelegateCommand MouseUpCommand { get; private set; }
+    public DelegateCommand<object> MouseUpCommand { get; private set; }
+
+    public DelegateCommand<object> ShapePenCheckedCommand { get; private set; }
 
     public MainWindowViewModel()
     {
         MouseMoveCommand = new DelegateCommand<object>(MouseMove);
         MouseDownCommand = new DelegateCommand<object> (MouseDown);
-        MouseUpCommand = new DelegateCommand(MouseUp);
+        MouseUpCommand = new DelegateCommand<object>(MouseUp);
+        ShapePenCheckedCommand = new DelegateCommand<object>(ShapePenChecked);
     }
 
     public void Draw(IGraphics graphics)
@@ -53,6 +52,10 @@ public class MainWindowViewModel : BindableBase
         foreach (var shape in _shapes)
         {
             shape.Draw(graphics);
+        }
+        if (_activeShape is IShapePen shapePen)
+        {
+            shapePen.Draw(graphics);
         }
     }
 
@@ -80,37 +83,13 @@ public class MainWindowViewModel : BindableBase
         }
         else
         {
-            // カーソルと_activeShapeを一旦初期化
-            element.Cursor = Cursors.Arrow;
-            _activeShape = null;
-
-            // 当たり判定
-            foreach (var shape in _shapes)
+            // カーソル移動時（カーソルが図形の上にある場合はその図形を、図形の上にない場合はShapePenをアクティブにする）
+            _activeShape = _shapePen;
+            foreach (var shape in _shapes.Reverse())
             {
-                var hitReult = shape.HitTest(currentPoint);
-                switch (hitReult)
-                {
-                    case HitResult.Body:
-                        element.Cursor = Cursors.SizeAll;
-                        break;
-                    case HitResult.ResizeN:
-                    case HitResult.ResizeS:
-                        element.Cursor = Cursors.SizeNS;
-                        break;
-                    case HitResult.ResizeE:
-                    case HitResult.ResizeW:
-                        element.Cursor = Cursors.SizeWE;
-                        break;
-                    case HitResult.ResizeNW:
-                    case HitResult.ResizeSE:
-                        element.Cursor = Cursors.SizeNWSE;
-                        break;
-                    case HitResult.ResizeNE:
-                    case HitResult.ResizeSW:
-                        element.Cursor = Cursors.SizeNESW;
-                        break;
-                }
-                if (hitReult is not HitResult.None)
+                var hitResult = shape.HitTest(currentPoint);
+                element.Cursor = SwitchCursor(hitResult);
+                if (hitResult is not HitResult.None)
                 {
                     _activeShape = shape;
                     break;
@@ -129,11 +108,20 @@ public class MainWindowViewModel : BindableBase
             return;
         }
 
+        // マウスの座標を取得
+        var position = Mouse.GetPosition(element);
+        var currentPoint = new Point((float)position.X, (float)position.Y);
+
         if (Mouse.LeftButton != MouseButtonState.Pressed)
         {
             return;
         }
-        // ActiveShapeだけはTrue、それ以外はFalse
+        // ShapePenがアクティブの場合
+        if (_activeShape is IShapePen shapePen)
+        {
+            shapePen.Locate(currentPoint);
+        }
+        // 選択状態をリセット（アクティブな図形のみ選択状態にする）
         foreach (var shape in _shapes)
         {
             shape.IsSelected = shape == _activeShape;
@@ -142,15 +130,67 @@ public class MainWindowViewModel : BindableBase
         element.InvalidateVisual();
     }
 
-    private void MouseUp()
+    private void MouseUp(object param)
     {
+        var element = param as SKElement;
+        if (element is null)
+        {
+            return;
+        }
         if (Mouse.LeftButton != MouseButtonState.Released)
         {
             return;
         }
-        if (_activeShape is not null)
+        if (_activeShape is null)
         {
-            _activeShape.Drop();
+            return;
         }
+        _activeShape.Drop();
+        if (_activeShape is IShapePen shapePen)
+        {
+            var shape = shapePen.CreateShape();
+            if (shape is null)
+            {
+                return;
+            }
+            _shapes.Add(shape);
+            _activeShape = shape;
+        }
+        element.InvalidateVisual();
+    }
+
+    private void ShapePenChecked(object param)
+    {
+        var mode = (PenMode)param;
+        _shapePen = mode switch
+        {
+            PenMode.Default => null,
+            PenMode.Rect => new ShapePen<RectangleShape>(
+                    new Stroke(Color.Red, 2.0f),
+                    new Fill(Color.LightSeaGreen)
+                ),
+            PenMode.Oval => new ShapePen<OvalShape>(
+                    new Stroke(Color.Green, 1.0f),
+                    new Fill(Color.LightYellow)
+                ),
+            _ => throw new InvalidOperationException()
+        };
+    }
+
+    private Cursor SwitchCursor(HitResult hitResult)
+    {
+        return hitResult switch
+        {
+            HitResult.Body => Cursors.SizeAll,
+            HitResult.ResizeN => Cursors.SizeNS,
+            HitResult.ResizeS => Cursors.SizeNS,
+            HitResult.ResizeE => Cursors.SizeWE,
+            HitResult.ResizeW => Cursors.SizeWE,
+            HitResult.ResizeNW => Cursors.SizeNWSE,
+            HitResult.ResizeSE => Cursors.SizeNWSE,
+            HitResult.ResizeNE => Cursors.SizeNESW,
+            HitResult.ResizeSW => Cursors.SizeNESW,
+            _ => Cursors.Arrow
+        };
     }
 }

@@ -71,7 +71,7 @@ public class ShapePen<TShape> : IShapePen where TShape : IShape, new()
             HitTestStrategy = Template.HitTestStrategy,
             IsSelected = true
         };
-        shape.SetBounds(shape.Bounds);
+        shape.SetBounds(Shape.Bounds);
         return shape;
     }
 

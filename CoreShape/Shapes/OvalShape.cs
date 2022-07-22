@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 namespace CoreShape.Shapes;
 public partial class OvalShape : RectangleShape
 {
+    public OvalShape() : this(new Rectangle())
+    { }
+
     public OvalShape(Rectangle bounds) : base(bounds, new OvalHitTestStrategy())
     { }
 

@@ -7,11 +7,29 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:WpfPaintApp"
+        xmlns:vm="clr-namespace:WpfPaintApp.ViewModels"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <ToolBar VerticalAlignment="Top">
+            <RadioButton x:Name="DefaultButton" Width="32" Height="32" Content="↖" IsChecked="True"
+                         Command="{Binding ShapePenCheckedCommand}" CommandParameter="{x:Static vm:PenMode.Default}"/>
+            <RadioButton x:Name="RectButton" Width="32" Height="32"
+                         Command="{Binding ShapePenCheckedCommand}" CommandParameter="{x:Static vm:PenMode.Rect}">
+                <Rectangle Width="24" Height="16" Stroke="Black" />
+            </RadioButton>
+            <RadioButton x:Name="OvalButton" Width="32" Height="32"
+                         Command="{Binding ShapePenCheckedCommand}" CommandParameter="{x:Static vm:PenMode.Oval}">
+                <Ellipse Width="24" Height="16" Stroke="Black" />
+            </RadioButton>
+        </ToolBar>
         <skiaSharp:SKElement
+            Grid.Row="1"
             x:Name="skElement"
             PaintSurface="skElement_PaintSurface">
             <i:Interaction.Triggers>
@@ -22,7 +40,7 @@
                     <i:InvokeCommandAction Command="{Binding MouseDownCommand}" CommandParameter="{Binding ElementName=skElement}"/>
                 </i:EventTrigger>
                 <i:EventTrigger EventName="MouseUp">
-                    <i:InvokeCommandAction Command="{Binding MouseUpCommand}"/>
+                    <i:InvokeCommandAction Command="{Binding MouseUpCommand}" CommandParameter="{Binding ElementName=skElement}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </skiaSharp:SKElement>

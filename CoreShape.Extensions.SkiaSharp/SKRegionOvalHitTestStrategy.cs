@@ -1,5 +1,6 @@
 ﻿using CoreShape.Extensions.SkiaSharp.Extensions;
 using CoreShape.Shapes;
+using CoreShape.Shapes.Interfaces;
 using CoreShape.Shapes.Strategy;
 using SkiaSharp;
 using System;
@@ -9,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreShape.Extensions.SkiaSharp;
-public class SKRegionOvalHitTestStrategy : IHitTestStrategy<RectangleShape>
+public class SKRegionOvalHitTestStrategy : IHitTestStrategy
 {
-    public bool HitTest(Point p, RectangleShape shape)
+    public bool HitTest(Point p, IShape shape)
     {
         var stroke = shape.Stroke;
         if (stroke is not null && stroke.Width < 4)
